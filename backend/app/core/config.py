@@ -10,8 +10,8 @@ class Settings(BaseSettings):
     # Security
     secret_key: str = "change-me-to-a-random-string"
 
-    # CORS
-    cors_origins: list[str] = ["http://localhost:3000"]
+    # CORS — accepts comma-separated string or "*"
+    cors_origins: str = "http://localhost:3000"
 
     # Text limits
     max_text_length: int = 50_000
@@ -21,6 +21,12 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+
+    def get_cors_origins(self) -> list[str]:
+        """Parse CORS origins from string."""
+        if self.cors_origins == "*":
+            return ["*"]
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 
 @lru_cache

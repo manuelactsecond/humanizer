@@ -18,8 +18,12 @@ def _get_database_url() -> str:
     # Neon and some providers use postgres:// but SQLAlchemy needs postgresql+asyncpg://
     if url.startswith("postgres://"):
         url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-    elif url.startswith("postgresql://"):
+    elif url.startswith("postgresql://") and not url.startswith("postgresql+"):
         url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    # Remove query params not supported by asyncpg (sslmode, channel_binding)
+    # SSL is handled via connect_args instead
+    if "?" in url:
+        url = url.split("?")[0]
     return url
 
 
