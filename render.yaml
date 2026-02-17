@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: humanizer-backend
+    runtime: python
+    region: frankfurt
+    rootDir: backend
+    buildCommand: |
+      pip install -r requirements.txt &&
+      python -c "import nltk; nltk.download('punkt_tab', quiet=True); nltk.download('averaged_perceptron_tagger_eng', quiet=True); nltk.download('wordnet', quiet=True); nltk.download('stopwords', quiet=True)"
+    startCommand: bash render_start.sh
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.12.7"
