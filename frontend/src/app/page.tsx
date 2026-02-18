@@ -6,6 +6,9 @@ import { useHumanization } from "@/hooks/use-humanization";
 import { DetectionResults } from "@/components/detection-results";
 import { HumanizationResults } from "@/components/humanization-results";
 import type { Language, Intensity } from "@/lib/types";
+import { IntensitySelector } from "@/components/intensity-selector";
+import { HumanizationProgress } from "@/components/humanization-progress";
+import { HowDetectionWorks } from "@/components/how-detection-works";
 import { Shield, Sparkles, Loader2, RotateCcw } from "lucide-react";
 
 export default function Home() {
@@ -91,7 +94,7 @@ export default function Home() {
                 disabled={isLoading}
               />
               <div className="absolute bottom-3 right-3 text-xs text-muted-foreground tabular-nums">
-                {wordCount} words
+                {text.length} chars · {wordCount} words
               </div>
             </div>
 
@@ -109,16 +112,7 @@ export default function Home() {
               </select>
 
               {/* Intensity Selector */}
-              <select
-                value={intensity}
-                onChange={(e) => setIntensity(e.target.value as Intensity)}
-                className="px-3 py-2 rounded-lg bg-card border border-border text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-                disabled={isLoading}
-              >
-                <option value="light">Light</option>
-                <option value="medium">Medium</option>
-                <option value="aggressive">Aggressive</option>
-              </select>
+              <IntensitySelector value={intensity} onChange={setIntensity} disabled={isLoading} />
 
               <div className="flex-1" />
 
@@ -163,16 +157,22 @@ export default function Home() {
             <h2 className="text-lg font-semibold">Results</h2>
 
             <div className="flex-1 p-6 rounded-lg bg-card border border-border overflow-y-auto min-h-[300px]">
-              {/* Loading State */}
-              {isLoading && (
+              {/* Loading State: Detection */}
+              {detection.loading && (
                 <div className="flex flex-col items-center justify-center h-full gap-4">
                   <Loader2 className="w-8 h-8 animate-spin text-primary" />
                   <p className="text-sm text-muted-foreground">
-                    {detection.loading
-                      ? "Analyzing text for AI patterns..."
-                      : "Humanizing text... This may take a moment."}
+                    Analyzing text for AI patterns...
                   </p>
                 </div>
+              )}
+
+              {/* Loading State: Humanization */}
+              {humanization.loading && (
+                <HumanizationProgress
+                  isActive={humanization.loading}
+                  isComplete={false}
+                />
               )}
 
               {/* Error State */}
@@ -190,29 +190,51 @@ export default function Home() {
               {activeView === "detection" &&
                 detection.result &&
                 !detection.loading && (
-                  <DetectionResults result={detection.result} />
+                  <div className="animate-fade-in">
+                    <DetectionResults result={detection.result} />
+                  </div>
                 )}
 
               {/* Humanization Results */}
               {activeView === "humanization" &&
                 humanization.result &&
                 !humanization.loading && (
-                  <HumanizationResults result={humanization.result} />
+                  <div className="animate-fade-in">
+                    <HumanizationResults result={humanization.result} />
+                  </div>
                 )}
 
               {/* Empty State */}
               {activeView === "none" && !isLoading && (
-                <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
-                  <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-muted-foreground" />
+                <div className="flex flex-col gap-4 h-full">
+                  {/* Action cards */}
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border">
+                      <Shield className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Detect AI</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Analyzes your text against 4 statistical tests to determine if it was written by AI, human, or a mix.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/30 border border-border">
+                      <Sparkles className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+                      <div>
+                        <p className="text-sm font-medium">Humanize</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          Rewrites AI-generated text to sound naturally human while preserving the original meaning.
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium">No results yet</p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Paste text and click &quot;Detect AI&quot; or
-                      &quot;Humanize&quot; to get started
-                    </p>
-                  </div>
+
+                  {/* How detection works */}
+                  <HowDetectionWorks />
+
+                  <p className="text-xs text-muted-foreground text-center mt-auto">
+                    Paste text and click &quot;Detect AI&quot; or &quot;Humanize&quot; to get started
+                  </p>
                 </div>
               )}
             </div>

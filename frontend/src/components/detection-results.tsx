@@ -3,6 +3,7 @@
 import type { DetectionResult } from "@/lib/types";
 import { ScoreGauge } from "./score-gauge";
 import { FeatureBar } from "./feature-bar";
+import { HowDetectionWorks } from "./how-detection-works";
 
 interface DetectionResultsProps {
   result: DetectionResult;
@@ -53,6 +54,9 @@ export function DetectionResults({ result }: DetectionResultsProps) {
 
   return (
     <div className="space-y-6">
+      {/* How it works */}
+      <HowDetectionWorks />
+
       {/* Header: Score + Verdict */}
       <div className="flex items-center gap-6">
         <div className="relative">
